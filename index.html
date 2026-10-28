@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бизнес Кликер</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+        .container {
+            text-align: center;
+            background: #161623;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 { font-size: 24px; margin-bottom: 5px; color: #4ecca3; }
+        .score-box { font-size: 32px; font-weight: bold; margin: 20px 0; }
+        .stats { font-size: 14px; color: #a0a0a5; margin-bottom: 20px; }
+        
+        /* Главная кнопка-кликер */
+        .click-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ecca3, #239270);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #1b6d53, 0 15px 20px rgba(0,0,0,0.4);
+            transition: transform 0.05s, box-shadow 0.05s;
+            outline: none;
+            margin-bottom: 30px;
+        }
+        .click-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #1b6d53, 0 8px 10px rgba(0,0,0,0.4);
+        }
+        
+        /* Секция улучшений */
+        .upgrades { display: flex; flex-direction: column; gap: 10px; }
+        .upgrade-btn {
+            background: #232946;
+            color: #fffffe;
+            border: 1px solid #4ecca3;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .upgrade-btn:hover { background: #333a56; }
+        .upgrade-btn:disabled {
+            background: #121620;
+            border-color: #444;
+            color: #777;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Мой Бизнес Продукт</h1>
+    <div class="score-box"><span id="balance">0</span> 🪙</div>
+    <div class="stats">
+        Доход за клик: +<span id="click-power">1</span><br>
+        Пассивный доход: +<span id="pps">0</span>/сек
+    </div>
+
+    <button class="click-btn" id="main-click"></button>
+
+    <div class="upgrades">
+        <button class="upgrade-btn" id="buy-click">
+            <span>Сила клика (+1)</span>
+            <span id="click-cost">10 🪙</span>
+        </button>
+        <button class="upgrade-btn" id="buy-passive">
+            <span>Авто-майнинг (+1/сек)</span>
+            <span id="passive-cost">50 🪙</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Игровое состояние
+    let balance = 0;
+    let clickPower = 1;
+    let passiveIncome = 0;
+
+    let clickUpgradeCost = 10;
+    let passiveUpgradeCost = 50;
+
+    // Элементы интерфейса
+    const balanceEl = document.getElementById('balance');
+    const clickPowerEl = document.getElementById('click-power');
+    const ppsEl = document.getElementById('pps');
+    const clickCostEl = document.getElementById('click-cost');
+    const passiveCostEl = document.getElementById('passive-cost');
+    
+    const mainClickBtn = document.getElementById('main-click');
+    const buyClickBtn = document.getElementById('buy-click');
+    const buyPassiveBtn = document.getElementById('buy-passive');
+
+    // Функция обновления экрана
+    function updateUI() {
+        balanceEl.innerText = Math.floor(balance);
+        clickPowerEl.innerText = clickPower;
+        ppsEl.innerText = passiveIncome;
+        clickCostEl.innerText = clickUpgradeCost + ' 🪙';
+        passiveCostEl.innerText = passiveUpgradeCost + ' 🪙';
+
+        // Кнопки активны только если хватает монет
+        buyClickBtn.disabled = balance < clickUpgradeCost;
+        buyPassiveBtn.disabled = balance < passiveUpgradeCost;
+    }
+
+    // Главный клик
+    mainClickBtn.addEventListener('click', () => {
+        balance += clickPower;
+        updateUI();
+    });
+
+    // Покупка улучшения клика
+    buyClickBtn.addEventListener('click', () => {
+        if (balance >= clickUpgradeCost) {
+            balance -= clickUpgradeCost;
+            clickPower += 1;
+            clickUpgradeCost = Math.round(clickUpgradeCost * 1.5);
+            updateUI();
+        }
+    });
+
+    // Покупка пассивного дохода
+    buyPassiveBtn.addEventListener('click', () => {
+        if (balance >= passiveUpgradeCost) {
+            balance -= passiveUpgradeCost;
+            passiveIncome += 1;
+            passiveUpgradeCost = Math.round(passiveUpgradeCost * 1.6);
+            updateUI();
+        }
+    });
+
+    // Таймер пассивного дохода (работает каждую секунду)
+    setInterval(() => {
+        balance += passiveIncome;
+        updateUI();
+    }, 1000);
+
+    // Первичный запуск UI
+    updateUI();
+</script>
+
+</body>
+</html>
